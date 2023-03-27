@@ -1,14 +1,13 @@
 import { View, Dimensions } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { LineChart } from 'react-native-chart-kit';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
+const db = SQLite.openDatabase('dades.db');
 
 export default function DadesScreen() {
-  const db = SQLite.openDatabase('dades.db');
-  const [chartData, setChartData] = useState();
-  const [selectedCountry, setSelectedCountry] = useState('All');
-  const [selectedSeries, setSelectedSeries] = useState('All');
+  const [chartData, setChartData] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState({ country: 'All', series: 'All' });
 
   useEffect(() => {
     loadData();
@@ -16,7 +15,15 @@ export default function DadesScreen() {
 
   const loadData = async () => {
     try {
-      await db.transaction((tx) => {
+      await db.transaction(async (tx) => {
+        /*tx.executeSql(
+          `DROP TABLE IF EXISTS data;`,
+          [],
+          () => { console.log('Tabla eliminada'); },
+          (_, error) => { console.log('Error al eliminar la tabla: ', error); }
+        );
+        */
+
         tx.executeSql(
           `CREATE TABLE IF NOT EXISTS data (
             Country_Name STRING,
@@ -35,20 +42,43 @@ export default function DadesScreen() {
             YR2021 NUMBER
           );`,
           [],
-          () => { },
+          () => { console.log('Va bonito '); },
           (_, error) => {
             console.log('Error al crear la tabla: ', error);
           }
         );
 
         tx.executeSql(
-          `SELECT * FROM data`,
+          `SELECT COUNT(*) FROM data`,
           [],
-          (_, { rows: { _array } }) => {
-            setChartData(_array);
+          async (_, result) => {
+            const count = result.rows.item(0)['COUNT(*)'];
+            if (count === 0) {
+              const jsonData = require('./dades.json');
+              for (let data of jsonData) {
+                await tx.executeSql(
+                  'INSERT INTO data (Country_Name, Country_Code, Series_Name, Series_Code, YR2012, YR2013, YR2014, YR2015, YR2016, YR2017, YR2018, YR2019, YR2020, YR2021) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                  [data.Country_Name, data.Country_Code, data.Series_Name, data.Series_Code, data.YR2012, data.YR2013, data.YR2014, data.YR2015, data.YR2016, data.YR2017, data.YR2018, data.YR2019, data.YR2020, data.YR2021],
+                  () => { console.log('Fila agregada con éxito'); },
+                  (_, error) => { console.log('Error al agregar la fila: ', error); }
+                );
+              }
+              setChartData(jsonData);
+            } else {
+              tx.executeSql(
+                `SELECT * FROM data`,
+                [],
+                (_, { rows: { _array } }) => {
+                  setChartData(_array);
+                },
+                (_, error) => {
+                  console.log('Error al cargar los datos: ', error);
+                }
+              );
+            }
           },
           (_, error) => {
-            console.log('Error al cargar los datos: ', error);
+            console.log('Error al contar las filas: ', error);
           }
         );
       });
@@ -56,65 +86,49 @@ export default function DadesScreen() {
       console.log('Error al cargar los datos: ', error);
     }
   };
-
-  const filterData = (data) => {
-    if (selectedCountry === 'All' && selectedSeries === 'All') {
-      return data;
-    }
-
-    if (selectedCountry !== 'All' && selectedSeries === 'All') {
-      return data.filter((item) => item.Country_Name === selectedCountry);
-    }
-
-    if (selectedCountry === 'All' && selectedSeries !== 'All') {
-      return data.filter((item) => item.Series_Name === selectedSeries);
-    }
-
-    return data.filter(
-      (item) =>
-        item.Country_Name === selectedCountry && item.Series_Name === selectedSeries
+  const filteredChartData = useMemo(() => {
+    return chartData.filter((item) =>
+      (selectedFilter.country === 'All' || item.Country_Name === selectedFilter.country) &&
+      (selectedFilter.series === 'All' || item.Series_Name === selectedFilter.series)
     );
-  };
+  }, [chartData, selectedFilter]);
+
+  const countryOptions = useMemo(() => {
+    const countryNames = chartData.map(data => data.Country_Name);
+    return ['All', ...new Set(countryNames)];
+  }, [chartData]);
+
+  const seriesOptions = useMemo(() => {
+    const seriesNames = chartData.map(data => data.Series_Name);
+    return ['All', ...new Set(seriesNames)];
+  }, [chartData]);
 
   return (
-    <View >
+    <View>
       <View>
         <Picker
-          selectedValue={selectedCountry}
-          onValueChange={(itemValue, itemIndex) => setSelectedCountry(itemValue)}
+          selectedValue={selectedFilter.country}
+          onValueChange={(value) => setSelectedFilter({ ...selectedFilter, country: value })}
         >
-          <Picker.Item label="All" value="All" />
-          {chartData &&
-            Array.from(new Set(chartData.map(data => data.Country_Name))).map(
-              countryName => (
-                <Picker.Item
-                  key={countryName}
-                  label={countryName}
-                  value={countryName}
-                />
-              )
-            )}
+          {countryOptions.map((countryName) => (
+            <Picker.Item
+              key={countryName}
+              label={countryName}
+              value={countryName}
+            />
+          ))}
         </Picker>
-
         <Picker
-          selectedValue={selectedSeries}
-          onValueChange={(itemValue, itemIndex) => setSelectedSeries(itemValue)}
+          selectedValue={selectedFilter.series}
+          onValueChange={(value) => setSelectedFilter({ ...selectedFilter, series: value })}
         >
-          <Picker.Item label="All" value="All" />
-          {chartData &&
-            Array.from(new Set(chartData.map(data => data.Series_Name))).map(
-              seriesName => (
-                <Picker.Item
-                  key={seriesName}
-                  label={seriesName}
-                  value={seriesName}
-                />
-              )
-            )}
+          {seriesOptions.map((seriesName) => (
+            <Picker.Item key={seriesName} label={seriesName} value={seriesName} />
+          ))}
         </Picker>
       </View>
 
-      {chartData && (
+      {filteredChartData.length > 0 && (
         <LineChart
           data={{
             labels: [
@@ -131,13 +145,7 @@ export default function DadesScreen() {
             ],
             datasets: [
               {
-                data: chartData
-                  .filter(
-                    data =>
-                      (data.Country_Name === selectedCountry || selectedCountry === 'All') &&
-                      (data.Series_Name === selectedSeries || selectedSeries === 'All')
-                  )
-                  .map(data => data.YR2021),
+                data: filteredChartData.map((data) => data.YR2021),
                 color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
               },
             ],
@@ -163,5 +171,5 @@ export default function DadesScreen() {
         />
       )}
     </View>
-  );
-}  
+  )
+}
