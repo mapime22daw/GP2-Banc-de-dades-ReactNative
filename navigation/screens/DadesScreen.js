@@ -1,13 +1,14 @@
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { LineChart } from 'react-native-chart-kit';
 import { useEffect, useState } from 'react';
-import { Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
 
 export default function DadesScreen() {
   const db = SQLite.openDatabase('dades.db');
   const [chartData, setChartData] = useState();
+  const [selectedCountry, setSelectedCountry] = useState('All');
+  const [selectedSeries, setSelectedSeries] = useState('All');
 
   useEffect(() => {
     loadData();
@@ -15,62 +16,104 @@ export default function DadesScreen() {
 
   const loadData = async () => {
     try {
-      // Lee los datos guardados en AsyncStorage
-      const storedData = await AsyncStorage.getItem('chartData');
-
-      if (storedData !== null) {
-        // Si hay datos guardados, los utiliza
-        setChartData(JSON.parse(storedData));
-      } else {
-        // Si no hay datos guardados, los carga desde la base de datos SQLite
-
-        await db.transaction(tx => {
-          tx.executeSql(
-            `CREATE TABLE IF NOT EXISTS data (
-              Country_Name STRING,
-              Country_Code STRING,
-              Series_Name STRING,
-              Series_Code STRING,
-              YR2012 NUMBER,
-              YR2013 NUMBER,
-              YR2014 NUMBER,
-              YR2015 NUMBER,
-              YR2016 NUMBER,
-              YR2017 NUMBER,
-              YR2018 NUMBER,
-              YR2019 NUMBER,
-              YR2020 NUMBER,
-              YR2021 NUMBER
-            );`,
-            [],
-            () => { }
-          );
-        });
-
-        const jsonData = require('./dades.json');
-
-        /*await db.transaction(async tx => {
-          for (let data of jsonData) {
-            await tx.executeSql(
-              'INSERT INTO data (Country_Name, Country_Code, Series_Name, Series_Code, YR2012, YR2013, YR2014, YR2015, YR2016, YR2017, YR2018, YR2019, YR2020, YR2021) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-              [data.Country_Name, data.Country_Code, data.Series_Name, data.Series_Code, data.YR2012, data.YR2013, data.YR2014, data.YR2015, data.YR2016, data.YR2017, data.YR2018, data.YR2019, data.YR2020, data.YR2021],
-              () => { console.log('Fila agregada con éxito'); },
-              (_, error) => { console.log('Error al agregar la fila: ', error); }
-            );
+      await db.transaction((tx) => {
+        tx.executeSql(
+          `CREATE TABLE IF NOT EXISTS data (
+            Country_Name STRING,
+            Country_Code STRING,
+            Series_Name STRING,
+            Series_Code STRING,
+            YR2012 NUMBER,
+            YR2013 NUMBER,
+            YR2014 NUMBER,
+            YR2015 NUMBER,
+            YR2016 NUMBER,
+            YR2017 NUMBER,
+            YR2018 NUMBER,
+            YR2019 NUMBER,
+            YR2020 NUMBER,
+            YR2021 NUMBER
+          );`,
+          [],
+          () => { },
+          (_, error) => {
+            console.log('Error al crear la tabla: ', error);
           }
-        });*/
+        );
 
-        setChartData(jsonData);
-
-        // Guarda los datos en AsyncStorage para su uso posterior
-        await AsyncStorage.setItem('chartData', JSON.stringify(jsonData));
-      }
+        tx.executeSql(
+          `SELECT * FROM data`,
+          [],
+          (_, { rows: { _array } }) => {
+            setChartData(_array);
+          },
+          (_, error) => {
+            console.log('Error al cargar los datos: ', error);
+          }
+        );
+      });
     } catch (error) {
       console.log('Error al cargar los datos: ', error);
     }
   };
+
+  const filterData = (data) => {
+    if (selectedCountry === 'All' && selectedSeries === 'All') {
+      return data;
+    }
+
+    if (selectedCountry !== 'All' && selectedSeries === 'All') {
+      return data.filter((item) => item.Country_Name === selectedCountry);
+    }
+
+    if (selectedCountry === 'All' && selectedSeries !== 'All') {
+      return data.filter((item) => item.Series_Name === selectedSeries);
+    }
+
+    return data.filter(
+      (item) =>
+        item.Country_Name === selectedCountry && item.Series_Name === selectedSeries
+    );
+  };
+
   return (
-    <View>
+    <View >
+      <View>
+        <Picker
+          selectedValue={selectedCountry}
+          onValueChange={(itemValue, itemIndex) => setSelectedCountry(itemValue)}
+        >
+          <Picker.Item label="All" value="All" />
+          {chartData &&
+            Array.from(new Set(chartData.map(data => data.Country_Name))).map(
+              countryName => (
+                <Picker.Item
+                  key={countryName}
+                  label={countryName}
+                  value={countryName}
+                />
+              )
+            )}
+        </Picker>
+
+        <Picker
+          selectedValue={selectedSeries}
+          onValueChange={(itemValue, itemIndex) => setSelectedSeries(itemValue)}
+        >
+          <Picker.Item label="All" value="All" />
+          {chartData &&
+            Array.from(new Set(chartData.map(data => data.Series_Name))).map(
+              seriesName => (
+                <Picker.Item
+                  key={seriesName}
+                  label={seriesName}
+                  value={seriesName}
+                />
+              )
+            )}
+        </Picker>
+      </View>
+
       {chartData && (
         <LineChart
           data={{
@@ -88,7 +131,13 @@ export default function DadesScreen() {
             ],
             datasets: [
               {
-                data: chartData.map((data) => data.YR2021),
+                data: chartData
+                  .filter(
+                    data =>
+                      (data.Country_Name === selectedCountry || selectedCountry === 'All') &&
+                      (data.Series_Name === selectedSeries || selectedSeries === 'All')
+                  )
+                  .map(data => data.YR2021),
                 color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
               },
             ],
@@ -99,7 +148,7 @@ export default function DadesScreen() {
           chartConfig={{
             backgroundColor: '#00d547',
             backgroundGradientFrom: '#00d547',
-            backgroundGradientTo: '#00d547#ffa726',
+            backgroundGradientTo: '#00d597',
             decimalPlaces: 2,
             color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             style: {
@@ -115,4 +164,4 @@ export default function DadesScreen() {
       )}
     </View>
   );
-}
+}  
