@@ -6,15 +6,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Screens
 import iniciScreen from './screens/IniciScreen';
-import dadesScreen from './screens/DadesScreen.js';
 import ajudaScreen from './screens/AjudaScreen';
-import Tabla from './screens/Tabla';
+import tablaScreen from './screens/TablaScreen';
 
 //Screen names
 const iniciName = "Inici";
-const dadesName = "Dades";
 const ajudaName = "Ajuda";
-const Tablaname = "Tabla";
+const tablaName = "Tabla";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,14 +29,11 @@ function MainContainer() {
             if (rn === iniciName) {
               iconName = focused ? 'home' : 'home-outline';
 
-            } else if (rn === dadesName) {
-              iconName = focused ? 'list' : 'list-outline';
-
             } else if (rn === ajudaName) {
               iconName = focused ? 'information-circle-outline' : 'information-circle-outline';
             
-            } else if (rn === Tablaname) {
-              iconName = focused ? 'information-circle-outline' : 'information-circle-outline';
+            } else if (rn === tablaName) {
+              iconName = focused ? 'list' : 'list-outline';
             }
 
             // You can return any component that you like here!
@@ -51,9 +46,9 @@ function MainContainer() {
         })}
       >
         <Tab.Screen name={iniciName} component={iniciScreen} />
-        <Tab.Screen name={dadesName} component={dadesScreen} />
+        <Tab.Screen name={tablaName} component={tablaScreen} />
         <Tab.Screen name={ajudaName} component={ajudaScreen} />
-        <Tab.Screen name={Tablaname} component={Tabla} />
+        
       </Tab.Navigator>
     </NavigationContainer>
 
