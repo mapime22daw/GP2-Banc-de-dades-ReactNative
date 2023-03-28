@@ -8,11 +8,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import iniciScreen from './screens/IniciScreen';
 import dadesScreen from './screens/DadesScreen.js';
 import ajudaScreen from './screens/AjudaScreen';
+import Tabla from './screens/Tabla';
 
 //Screen names
 const iniciName = "Inici";
 const dadesName = "Dades";
 const ajudaName = "Ajuda";
+const Tablaname = "Tabla";
 
 const Tab = createBottomTabNavigator();
 
@@ -34,6 +36,9 @@ function MainContainer() {
 
             } else if (rn === ajudaName) {
               iconName = focused ? 'information-circle-outline' : 'information-circle-outline';
+            
+            } else if (rn === Tablaname) {
+              iconName = focused ? 'information-circle-outline' : 'information-circle-outline';
             }
 
             // You can return any component that you like here!
@@ -48,6 +53,7 @@ function MainContainer() {
         <Tab.Screen name={iniciName} component={iniciScreen} />
         <Tab.Screen name={dadesName} component={dadesScreen} />
         <Tab.Screen name={ajudaName} component={ajudaScreen} />
+        <Tab.Screen name={Tablaname} component={Tabla} />
       </Tab.Navigator>
     </NavigationContainer>
 
