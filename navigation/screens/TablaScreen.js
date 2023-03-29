@@ -20,13 +20,13 @@ export default function TableScreen() {
 
   const createData = () => {
     db.transaction((tx) => {
-      /*tx.executeSql(
+      tx.executeSql(
         `DROP TABLE IF EXISTS data;`,
         [],
         () => { console.log('Tabla eliminada'); },
         (_, error) => { console.log('Error al eliminar la tabla: ', error); }
       );
-        */
+        
 
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS data (
@@ -112,7 +112,7 @@ export default function TableScreen() {
   const paginatedTableData = filteredTableData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   function redondearDosDecimales(numero) {
-    if(numero==" "){
+    if (numero == " ") {
       return 0
     }
     else
@@ -152,19 +152,11 @@ export default function TableScreen() {
       paddingHorizontal: 5,
       textAlign: 'center',
     },
-    pagination: {
+    buttonContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'center',
       marginVertical: 10,
-    },
-    pageButton: {
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 5,
-      padding: 5,
-    },
-    activePageButton: {
-      backgroundColor: '#f2f2f2',
     },
     previousNextButton: {
       paddingVertical: 5,
@@ -177,11 +169,16 @@ export default function TableScreen() {
     activePreviousNextButton: {
       backgroundColor: '#f2f2f2',
     },
-    tripleCell: {
-      flex: 3,
+    pageButton: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 5,
+      padding: 5,
+      marginRight: 5,
     },
-    normalCell: {
-      flex: 1,
+    activePageButton: {
+      backgroundColor: 'blue',
+      color: '#fff',
     },
   });
 
@@ -206,7 +203,7 @@ export default function TableScreen() {
         <View>
           <View style={styles.table}>
             <View style={styles.row}>
-              <Text style={[styles.headerText, { flex: 3 }]}>Indicador</Text>
+              <Text style={[styles.headerText, { flex: 2 }]}>Indicador</Text>
               {tableHeaders.slice(1).map((header, index) => (
                 <Text key={index} style={[styles.headerText, { flex: 1 }]}>
                   {header}
@@ -215,7 +212,8 @@ export default function TableScreen() {
             </View>
             {tableRows.map((row, index) => (
               <View key={index} style={styles.row}>
-                {row.map((cell, index) => (
+                <Text style={[styles.rowText, { flex: 2 }]}>{row[0]}</Text>
+                {row.slice(1).map((cell, index) => (
                   <Text key={index} style={[styles.rowText, { flex: 1 }]}>
                     {cell}
                   </Text>
@@ -223,53 +221,37 @@ export default function TableScreen() {
               </View>
             ))}
           </View>
-          <View style={styles.pagination}>
-            <Text>Page: {page + 1}</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Text
-                style={[
-                  styles.pageButton,
-                  itemsPerPage === 10 && styles.activePageButton,
-                ]}
-                onPress={() => handleItemsPerPageChange(10)}
-              >
-                10
-              </Text>
-              <Text
-                style={[
-                  styles.pageButton,
-                  itemsPerPage === 25 && styles.activePageButton,
-                ]}
-                onPress={() => handleItemsPerPageChange(25)}
-              >
-                25
-              </Text>
-              <Text
-                style={[
-                  styles.pageButton,
-                  itemsPerPage === 50 && styles.activePageButton,
-                ]}
-                onPress={() => handleItemsPerPageChange(50)}
-              >
-                50
-              </Text>
-            </View>
-            <View>
-              <Text
-                style={[styles.previousNextButton, page === 0 && styles.activePreviousNextButton,]}
-                onPress={() => handlePageChange(page - 1)}
-              >
-                Previous
-              </Text>
-              <Text>{page + 1}</Text>
-              <Text
-                style={[styles.previousNextButton, (page + 1) * itemsPerPage >= styles.activePreviousNextButton,]}
-                onPress={() => handlePageChange(page + 1)}
-              >
-                Next
-              </Text>
-
-            </View>
+          <View style={styles.buttonContainer}>
+            <Text
+              style={[styles.previousNextButton, page === 0 && styles.activePreviousNextButton]}
+              onPress={() => handlePageChange(page - 1)}
+            >
+              Previous
+            </Text>
+            <Text
+              style={[styles.pageButton, itemsPerPage === 10 && styles.activePageButton]}
+              onPress={() => handleItemsPerPageChange(10)}
+            >
+              10
+            </Text>
+            <Text
+              style={[styles.pageButton, itemsPerPage === 20 && styles.activePageButton]}
+              onPress={() => handleItemsPerPageChange(20)}
+            >
+              20
+            </Text>
+            <Text
+              style={[styles.pageButton, itemsPerPage === 50 && styles.activePageButton]}
+              onPress={() => handleItemsPerPageChange(50)}
+            >
+              50
+            </Text>
+            <Text
+              style={[styles.previousNextButton, (page + 1) * itemsPerPage >= tableData.length && styles.activePreviousNextButton,]}
+              onPress={() => handlePageChange(page + 1)}
+            >
+              Next
+            </Text>
           </View>
         </View>
       )}

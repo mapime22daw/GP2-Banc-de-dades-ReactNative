@@ -9,13 +9,16 @@ export default function AjudaScreen({ navigation }){
         Aquesta aplicació mostra les dades de pobresa de tot el món. Per utilitzar-la, segueix els següents passos:
       </Text>
       <Text style={styles.paragraph}>
-        1. A la pantalla principal, selecciona el país que vols veure.
+        1. A la pantalla Taula, escriu el país que vols veure.
       </Text>
       <Text style={styles.paragraph}>
-        2. A continuació, es mostrarà la informació sobre la taxa de pobresa en aquest país.
+        2. A continuació, es mostrarà la informació sobre les diferents dades de pobresa d' aquest país.
       </Text>
       <Text style={styles.paragraph}>
-        3. També pots seleccionar l'opció "Comparar" per veure com es compara la taxa de pobresa d'aquest país amb la d'altres països.
+        3. Tingues en compte, que el nom del país ha de ser en Anglès ja que els noms del paisos estan guardats en aquest idioma.
+      </Text>
+      <Text style={styles.paragraph}>
+        4. Abaix de tot, tens la paginació per poder navegar per la taula.
       </Text>
       <Text style={styles.paragraph}>
         I això és tot! Si tens algun dubte o problema, no dubtis en contactar-nos a través de l'opció "Contacte" en el menú principal.
