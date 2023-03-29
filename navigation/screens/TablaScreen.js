@@ -111,8 +111,15 @@ export default function TableScreen() {
 
   const paginatedTableData = filteredTableData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
+  function redondearDosDecimales(numero) {
+    if(numero==" "){
+      return 0
+    }
+    else
+      return Number(numero.toFixed(2));
+  }
   const tableHeaders = ['Indicador', '2015', '2016', '2017', '2018', '2019', '2020', '2021'];
-  const tableRows = paginatedTableData.map((row) => [row.Series_Name, row.YR2015, row.YR2016, row.YR2017, row.YR2018, row.YR2019, row.YR2020, row.YR2021]);
+  const tableRows = paginatedTableData.map((row) => [row.Series_Name, redondearDosDecimales(row.YR2015), redondearDosDecimales(row.YR2016), redondearDosDecimales(row.YR2017), redondearDosDecimales(row.YR2018), redondearDosDecimales(row.YR2019), redondearDosDecimales(row.YR2020), redondearDosDecimales(row.YR2021)]);
 
   const styles = StyleSheet.create({
     container: {
@@ -148,7 +155,6 @@ export default function TableScreen() {
     pagination: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
       marginVertical: 10,
     },
     pageButton: {
@@ -182,7 +188,7 @@ export default function TableScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: 'row', }}>
         <TextInput
           style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginRight: 5 }}
           placeholder="Filtrar por país"
