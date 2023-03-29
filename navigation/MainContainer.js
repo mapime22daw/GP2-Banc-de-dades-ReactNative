@@ -30,7 +30,7 @@ function MainContainer() {
               iconName = focused ? 'home' : 'home-outline';
 
             } else if (rn === ajudaName) {
-              iconName = focused ? 'information-circle-outline' : 'information-circle-outline';
+              iconName = focused ? 'help-circle-outline' : 'help-circle-outline';
             
             } else if (rn === tablaName) {
               iconName = focused ? 'list' : 'list-outline';
