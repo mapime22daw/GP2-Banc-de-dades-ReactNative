@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row, Rows } from 'react-native-table-component';
 import * as SQLite from 'expo-sqlite';
@@ -110,14 +111,13 @@ export default function TableScreen() {
 
   const paginatedTableData = filteredTableData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
-  const tableHeaders = ['2015', '2016', '2017', '2018', '2019', '2020', '2021'];
-  const tableRows = paginatedTableData.map((row) => [row.YR2015, row.YR2016, row.YR2017, row.YR2018, row.YR2019, row.YR2020, row.YR2021]);
+  const tableHeaders = ['Indicador', '2015', '2016', '2017', '2018', '2019', '2020', '2021'];
+  const tableRows = paginatedTableData.map((row) => [row.Series_Name, row.YR2015, row.YR2016, row.YR2017, row.YR2018, row.YR2019, row.YR2020, row.YR2021]);
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#fff',
-
     },
     table: {
       borderWidth: 1,
@@ -171,12 +171,17 @@ export default function TableScreen() {
     activePreviousNextButton: {
       backgroundColor: '#f2f2f2',
     },
-
+    tripleCell: {
+      flex: 3,
+    },
+    normalCell: {
+      flex: 1,
+    },
   });
 
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TextInput
           style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginRight: 5 }}
@@ -195,7 +200,8 @@ export default function TableScreen() {
         <View>
           <View style={styles.table}>
             <View style={styles.row}>
-              {tableHeaders.map((header, index) => (
+              <Text style={[styles.headerText, { flex: 3 }]}>Indicador</Text>
+              {tableHeaders.slice(1).map((header, index) => (
                 <Text key={index} style={[styles.headerText, { flex: 1 }]}>
                   {header}
                 </Text>
@@ -261,7 +267,6 @@ export default function TableScreen() {
           </View>
         </View>
       )}
-
-    </View>
+    </ScrollView>
   );
 }

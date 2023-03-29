@@ -1,15 +1,15 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-
+import { ScrollView } from 'react-native-gesture-handler';
 export default function IniciScreen({ navigation }) {
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <Text style={styles.title}>Benvingut a les dades de pobresa mundial!</Text>
             <Text style={styles.description}>Aquesta aplicació mostra dades de pobresa de tot el món per ajudar-te a comprendre millor el problema global de la pobresa. Pots seleccionar un país per veure les dades de pobresa d'aquell país o. Si necessites ajuda per utilitzar l'aplicació, prem el botó d'ajuda per obtenir més informació.</Text>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Taula')}>
                 <Text style={styles.buttonText}>Comença</Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 };
 
