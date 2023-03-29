@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { Table, Row, Rows } from 'react-native-table-component';
 import * as SQLite from 'expo-sqlite';
 const db = SQLite.openDatabase('dades.db');
@@ -8,6 +9,8 @@ export default function TableScreen() {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [countryFilter, setCountryFilter] = useState("");
+  const [seriesNameFilter, setSeriesNameFilter] = useState("");
 
   useEffect(() => {
     createData();
@@ -98,21 +101,23 @@ export default function TableScreen() {
   };
 
   const filteredTableData = tableData.filter((row) => {
-    // apply filters here
-    return true;
+    return (
+      (countryFilter === "" || row.Country_Name.toLowerCase().includes(countryFilter.toLowerCase())) &&
+      (seriesNameFilter === "" || row.Series_Name.toLowerCase().includes(seriesNameFilter.toLowerCase()))
+    );
   });
+
 
   const paginatedTableData = filteredTableData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
-  const tableHeaders = ['País', 'Indicador', 'Año 2015', 'Año 2016', 'Año 2017', 'Año 2018', 'Año 2019', 'Año 2020', 'Año 2021'];
-  const tableRows = paginatedTableData.map((row) => [row.Country_Name, row.Series_Name, row.YR2015, row.YR2016, row.YR2017, row.YR2018, row.YR2019, row.YR2020, row.YR2021]);
+  const tableHeaders = ['2015', '2016', '2017', '2018', '2019', '2020', '2021'];
+  const tableRows = paginatedTableData.map((row) => [row.YR2015, row.YR2016, row.YR2017, row.YR2018, row.YR2019, row.YR2020, row.YR2021]);
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
+
     },
     table: {
       borderWidth: 1,
@@ -166,78 +171,97 @@ export default function TableScreen() {
     activePreviousNextButton: {
       backgroundColor: '#f2f2f2',
     },
-    
+
   });
 
 
   return (
     <View style={styles.container}>
-      <View style={styles.table}>
-        <View style={styles.row}>
-          {tableHeaders.map((header, index) => (
-            <Text key={index} style={[styles.headerText, { flex: 1 }]}>
-              {header}
-            </Text>
-          ))}
-        </View>
-        {tableRows.map((row, index) => (
-          <View key={index} style={styles.row}>
-            {row.map((cell, index) => (
-              <Text key={index} style={[styles.rowText, { flex: 1 }]}>
-                {cell}
-              </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <TextInput
+          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginRight: 5 }}
+          placeholder="Filtrar por país"
+          value={countryFilter}
+          onChangeText={setCountryFilter}
+        />
+        <TextInput
+          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginLeft: 5 }}
+          placeholder="Filtrar por nombre de serie"
+          value={seriesNameFilter}
+          onChangeText={setSeriesNameFilter}
+        />
+      </View>
+      {countryFilter && tableData.length > 0 && (
+        <View>
+          <View style={styles.table}>
+            <View style={styles.row}>
+              {tableHeaders.map((header, index) => (
+                <Text key={index} style={[styles.headerText, { flex: 1 }]}>
+                  {header}
+                </Text>
+              ))}
+            </View>
+            {tableRows.map((row, index) => (
+              <View key={index} style={styles.row}>
+                {row.map((cell, index) => (
+                  <Text key={index} style={[styles.rowText, { flex: 1 }]}>
+                    {cell}
+                  </Text>
+                ))}
+              </View>
             ))}
           </View>
-        ))}
-      </View>
-      <View style={styles.pagination}>
-        <Text>Page: {page + 1}</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <Text
-            style={[
-              styles.pageButton,
-              itemsPerPage === 10 && styles.activePageButton,
-            ]}
-            onPress={() => handleItemsPerPageChange(10)}
-          >
-            10
-          </Text>
-          <Text
-            style={[
-              styles.pageButton,
-              itemsPerPage === 25 && styles.activePageButton,
-            ]}
-            onPress={() => handleItemsPerPageChange(25)}
-          >
-            25
-          </Text>
-          <Text
-            style={[
-              styles.pageButton,
-              itemsPerPage === 50 && styles.activePageButton,
-            ]}
-            onPress={() => handleItemsPerPageChange(50)}
-          >
-            50
-          </Text>
-        </View>
-        <View>
-          <Text
-            style={[styles.previousNextButton, page === 0 && styles.activePreviousNextButton,]}
-            onPress={() => handlePageChange(page - 1)}
-          >
-            Previous
-          </Text>
-          <Text>{page + 1}</Text>
-          <Text
-            style={[styles.previousNextButton, (page + 1) * itemsPerPage >=  styles.activePreviousNextButton,]}
-            onPress={() => handlePageChange(page + 1)}
-          >
-            Next
-          </Text>
+          <View style={styles.pagination}>
+            <Text>Page: {page + 1}</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text
+                style={[
+                  styles.pageButton,
+                  itemsPerPage === 10 && styles.activePageButton,
+                ]}
+                onPress={() => handleItemsPerPageChange(10)}
+              >
+                10
+              </Text>
+              <Text
+                style={[
+                  styles.pageButton,
+                  itemsPerPage === 25 && styles.activePageButton,
+                ]}
+                onPress={() => handleItemsPerPageChange(25)}
+              >
+                25
+              </Text>
+              <Text
+                style={[
+                  styles.pageButton,
+                  itemsPerPage === 50 && styles.activePageButton,
+                ]}
+                onPress={() => handleItemsPerPageChange(50)}
+              >
+                50
+              </Text>
+            </View>
+            <View>
+              <Text
+                style={[styles.previousNextButton, page === 0 && styles.activePreviousNextButton,]}
+                onPress={() => handlePageChange(page - 1)}
+              >
+                Previous
+              </Text>
+              <Text>{page + 1}</Text>
+              <Text
+                style={[styles.previousNextButton, (page + 1) * itemsPerPage >= styles.activePreviousNextButton,]}
+                onPress={() => handlePageChange(page + 1)}
+              >
+                Next
+              </Text>
 
+            </View>
+          </View>
         </View>
-      </View>
+      )}
+
     </View>
   );
 }
