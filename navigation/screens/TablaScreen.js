@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Picker } from '@react-native-picker/picker';
-import { Table, Row, Rows } from 'react-native-table-component';
 import * as SQLite from 'expo-sqlite';
 const db = SQLite.openDatabase('dades.db');
 
@@ -20,12 +18,12 @@ export default function TableScreen() {
 
   const createData = () => {
     db.transaction((tx) => {
-      tx.executeSql(
+      /*tx.executeSql(
         `DROP TABLE IF EXISTS data;`,
         [],
         () => { console.log('Tabla eliminada'); },
         (_, error) => { console.log('Error al eliminar la tabla: ', error); }
-      );
+      );*/
         
 
       tx.executeSql(
@@ -139,9 +137,10 @@ export default function TableScreen() {
     headerText: {
       fontWeight: 'bold',
       paddingVertical: 10,
-      paddingHorizontal: 5,
+      paddingHorizontal: 3,
       textAlign: 'center',
-    },
+      fontSize: 12, 
+    },    
     row: {
       flexDirection: 'row',
       borderBottomWidth: 1,
@@ -151,6 +150,7 @@ export default function TableScreen() {
       paddingVertical: 10,
       paddingHorizontal: 5,
       textAlign: 'center',
+      fontSize: 12, 
     },
     buttonContainer: {
       flexDirection: 'row',
@@ -187,20 +187,20 @@ export default function TableScreen() {
     <ScrollView style={styles.container}>
       <View style={{ flexDirection: 'row', }}>
         <TextInput
-          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginRight: 5 }}
+          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginRight: 5, marginLeft: 10 }}
           placeholder="Filtrar por país"
           value={countryFilter}
           onChangeText={setCountryFilter}
         />
         <TextInput
-          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginLeft: 5 }}
+          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginLeft: 5,marginRight: 10 }}
           placeholder="Filtrar por nombre de serie"
           value={seriesNameFilter}
           onChangeText={setSeriesNameFilter}
         />
       </View>
       {countryFilter && tableData.length > 0 && (
-        <View>
+        <View style={{marginLeft:10,marginRight:10}}>
           <View style={styles.table}>
             <View style={styles.row}>
               <Text style={[styles.headerText, { flex: 2 }]}>Indicador</Text>
@@ -226,7 +226,7 @@ export default function TableScreen() {
               style={[styles.previousNextButton, page === 0 && styles.activePreviousNextButton]}
               onPress={() => handlePageChange(page - 1)}
             >
-              Previous
+              Retrocedir
             </Text>
             <Text
               style={[styles.pageButton, itemsPerPage === 10 && styles.activePageButton]}
@@ -250,7 +250,7 @@ export default function TableScreen() {
               style={[styles.previousNextButton, (page + 1) * itemsPerPage >= tableData.length && styles.activePreviousNextButton,]}
               onPress={() => handlePageChange(page + 1)}
             >
-              Next
+              Avança
             </Text>
           </View>
         </View>

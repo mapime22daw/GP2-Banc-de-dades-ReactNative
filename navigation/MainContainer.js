@@ -12,7 +12,7 @@ import tablaScreen from './screens/TablaScreen';
 //Screen names
 const iniciName = "Inici";
 const ajudaName = "Ajuda";
-const tablaName = "Taula";
+const tablaName = "Dades";
 
 const Tab = createBottomTabNavigator();
 

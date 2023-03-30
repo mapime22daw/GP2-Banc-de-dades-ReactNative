@@ -9,7 +9,7 @@ export default function AjudaScreen({ navigation }){
         Aquesta aplicació mostra les dades de pobresa de tot el món. Per utilitzar-la, segueix els següents passos:
       </Text>
       <Text style={styles.paragraph}>
-        1. A la pantalla Taula, escriu el país que vols veure.
+        1. A la pantalla Dades, escriu el país que vols veure.
       </Text>
       <Text style={styles.paragraph}>
         2. A continuació, es mostrarà la informació sobre les diferents dades de pobresa d' aquest país.
@@ -21,7 +21,7 @@ export default function AjudaScreen({ navigation }){
         4. Abaix de tot, tens la paginació per poder navegar per la taula.
       </Text>
       <Text style={styles.paragraph}>
-        I això és tot! Si tens algun dubte o problema, no dubtis en contactar-nos a través de l'opció "Contacte" en el menú principal.
+        I això és tot! Si tens algun dubte o problema, no dubtis en contactar-nos a través del nostre correu info@pobresamundial.com
       </Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Tornar</Text>
