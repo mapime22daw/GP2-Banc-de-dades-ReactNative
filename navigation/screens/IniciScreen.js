@@ -13,6 +13,8 @@ export default function IniciScreen({ navigation }) {
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Dades')}>
                 <Text style={styles.buttonText}>Comença</Text>
             </TouchableOpacity>
+            <View style={{ height: 30 }} />
+
         </ScrollView>
     );
 };
