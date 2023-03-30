@@ -188,13 +188,13 @@ export default function TableScreen() {
       <View style={{ flexDirection: 'row', }}>
         <TextInput
           style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginRight: 5, marginLeft: 10 }}
-          placeholder="Filtrar por país"
+          placeholder="Filtrar per país"
           value={countryFilter}
           onChangeText={setCountryFilter}
         />
         <TextInput
           style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, flex: 1, marginLeft: 5,marginRight: 10 }}
-          placeholder="Filtrar por nombre de serie"
+          placeholder="Filtrar per nom de sèrie"
           value={seriesNameFilter}
           onChangeText={setSeriesNameFilter}
         />
